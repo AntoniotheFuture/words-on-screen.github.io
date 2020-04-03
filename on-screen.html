@@ -1,0 +1,305 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>在线全屏弹幕、接人弹幕、手机弹幕</title>
+        <script type="text/javascript">
+            var isfull = false;
+            var colorlist = ['black','white','red','orange','yellow','green','blue'];
+            var dlist = ['↑','↓','←','→','●'];
+            var tdlist = ['##','#<br>#'];
+            var binkspeed = ['——','|','||','|||','||||'];
+            var speedlist = ['■','▶','▶▶','▶▶▶'];
+            var sizelist = ['0.3','0.5','0.75','0.95'];
+            
+            function ready(){
+                setit('bink',binkspeed[0]);
+                setit('speed',speedlist[0]);
+                setit('d',dlist[0]);
+
+                setit('td',tdlist[0]);
+                setcolor('bg',colorlist[0]);
+                setcolor('Tc',colorlist[1]);
+                setit('Ts',sizelist[0]);
+                changeview();
+                run();
+            }
+
+            function changeview(){
+                var ele = document.getElementById('show');
+                document.body.style.backgroundColor = getcolor('bg');
+                ele.style.color = getcolor('Tc');
+                
+                if(getit('td') == '##'){
+                    ele.style.writingMode = 'lr-tb';
+                    var Theight = window.screen.height;
+                }else{
+                    ele.style.writingMode = 'tb-rl';
+                    var Theight = window.screen.width;
+                }
+                ele.style.fontSize = getit('Ts') *  Theight + 'px';
+                ele.innerHTML = document.getElementById('text').innerHTML;
+
+            }
+            var pid;
+            function run(){
+                var ele = document.getElementById('show');
+                var bink = getit('bink');
+                var binkspeed;
+                var d = getit('d');
+                var dx = 0;
+                var dy = 0;
+                var s = getit('speed');
+                var speed;
+                var contentw = ele.clientWidth;
+                var contenth = ele.clientHeight;
+                var fx = 0;
+                var fy = 0;
+                var b = 0;
+                
+                var stop = false;
+
+                if(bink == '——'){binkspeed = 0;}
+                if(bink == '||||'){binkspeed = 20;}
+                if(bink == '|||'){binkspeed = 50;}
+                if(bink == '||'){binkspeed = 100;}
+                if(bink == '|'){binkspeed = 100;}
+
+                var b = binkspeed;
+
+                if(d == '↑'){dx = -1;dy = 0;}
+                if(d == '↓'){dx = 1;dy = 0;}
+                if(d == '←'){dx = 0;dy = -1;}
+                if(d == '→'){dx = 0;dy = 1;}
+                if(d == '●'){dx = 0;dy = 0;}
+
+                if(s == '■'){speed = 0;}
+                if(s == '▶'){speed = 3;}
+                if(s == '▶▶'){speed = 6;}
+                if(s == '▶▶▶'){speed = 9;}
+
+                if(speed == 0 && binkspeed == 0){
+                    ele.style.top = '0px'; 
+                    ele.style.left = '0px'; 
+                    ele.style.display = 'block';}
+
+                clearInterval(pid);
+                pid = setInterval(frame, 5);
+                ele.style.display = 'block';
+                function frame() {
+                    
+                    if(binkspeed ==0){
+                        ele.style.display = 'block';
+                    }else{
+                        b--;
+                        if(b < 0){
+                            b = binkspeed;
+                            ele.style.display = ele.style.display == 'none'? 'block' : 'none';
+                        }
+                    }
+                    if(speed == 0){
+                        ele.style.top = '0px'; 
+                        ele.style.left = '0px'; 
+                    }else{
+                        fx = fx + (dx * speed);
+                        fy = fy + (dy * speed);
+                        
+                        if(fx > contenth){fx = -1 * contenth;}
+                        if(fx < -1 * contenth){fx = contenth;}
+                        if(fy > contentw){fy = -1 * contentw;}
+                        if(fy < -1 * contentw){fy = contentw;}
+                        //if(fy >= contentw||fy <= -1 * contentw){ fy = contentw * dy;}
+
+                        ele.style.top = fx + 'px'; 
+                        ele.style.left = fy + 'px'; 
+                    }
+
+                }
+                
+            }
+
+            //寻找下标
+            function apos(arrays, obj) {
+                var i = arrays.length;
+                while (i--) {
+                    if (arrays[i] === obj) {
+                        return i;
+                    }
+                }
+                return false;
+            }
+
+            function getit(id){return document.getElementById(id).innerHTML;}
+
+            function setit(id,t){document.getElementById(id).innerHTML = t;}
+
+            function getcolor(id){return document.getElementById(id).style.backgroundColor;}
+
+            function setcolor(id,colorname){document.getElementById(id).style.backgroundColor = colorname;}
+
+            function fullscreen(){
+                handleFullScreen();
+                isfull = !isfull;
+                d = isfull ? 'none' : 'block';
+                for(var i =0;i<document.body.childNodes.length;i ++){
+                    try{
+                    document.body.childNodes[i].style.display = d;
+                    }catch(e){};
+                }
+                document.getElementById('show').style.display = 'block';
+                document.getElementById('fullbutton').style.display = '';
+                
+                
+            }
+
+            function changebg(){
+                var s = getcolor('bg');
+                var i = apos(colorlist,s);
+                i++;
+                if(i>colorlist.length - 1){i = 0};
+                setcolor('bg',colorlist[i]);
+                changeview();
+            }
+
+            function changetcolor(){
+                var s = getcolor('Tc');
+                var i = apos(colorlist,s);
+                i++;
+                if(i>colorlist.length - 1){i = 0};
+                setcolor('Tc',colorlist[i]);
+                changeview();
+            }
+
+            function changetsize(){
+                var s = getit('Ts');
+                var i = apos(sizelist,s);
+                i++;
+                if(i>sizelist.length - 1){i = 0};
+                setit('Ts',sizelist[i]);
+                changeview();
+                run();
+            }
+
+            function changedirection(){
+                var s = getit('d');
+                var i = apos(dlist,s);
+                i++;
+                if(i>dlist.length - 1){i = 0};
+                setit('d',dlist[i]);
+                changeview();
+                run();
+            }
+
+            function changebink(){
+                var s = getit('bink');
+                var i = apos(binkspeed,s);
+                i++;
+                if(i>binkspeed.length - 1){i = 0};
+                setit('bink',binkspeed[i]);
+                run();
+            }
+
+            function changespeed(){
+                var s = getit('speed');
+                var i = apos(speedlist,s);
+                i++;
+                if(i>speedlist.length -1){i = 0};
+                setit('speed',speedlist[i]);
+                run();
+            }
+
+            function changetd(){
+                var s = getit('td');
+                var i = apos(tdlist,s);
+                i++;
+                if(i>tdlist.length - 1){i = 0};
+                setit('td',tdlist[i]);
+                run();
+            }
+
+            function handleFullScreen(){
+                let element = document.documentElement;
+                // 判断是否已经是全屏
+                // 如果是全屏，退出
+                if (isfull) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitCancelFullScreen) {
+                        document.webkitCancelFullScreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                    console.log('已还原！');
+                } else {    // 否则，进入全屏
+                    if (element.requestFullscreen) {
+                        element.requestFullscreen();
+                    } else if (element.webkitRequestFullScreen) {
+                        element.webkitRequestFullScreen();
+                    } else if (element.mozRequestFullScreen) {
+                        element.mozRequestFullScreen();
+                    } else if (element.msRequestFullscreen) {
+                        // IE11
+                        element.msRequestFullscreen();
+                    }
+                    console.log('已全屏！');
+                }
+            }
+        </script>
+        <script>
+            var _hmt = _hmt || [];
+            (function() {
+              var hm = document.createElement("script");
+              hm.src = "https://hm.baidu.com/hm.js?27b93fb7616962bbedb71ae788c280b9";
+              var s = document.getElementsByTagName("script")[0]; 
+              s.parentNode.insertBefore(hm, s);
+            })();
+        </script>
+        <style>
+            .divbuttons {
+                margin-left: 10px;
+                width:50px;
+                height:50px;
+                background-color:lightgray;
+                border-radius:15px;
+                float: left;
+                font-size: 35px; 
+                text-align: center;
+                background-color: white;
+            }
+
+        </style>
+    </head>
+    <body onload="ready();" style="padding:0px;width:100;height:100%;overflow: hidden;">
+        <div id = 'show' style="position: absolute;font-size: 1000px;text-align: center;">
+            1231221321213
+        </div>
+        <div onclick="fullscreen();" id="fullbutton" style="position:absolute;bottom:0px;left: 0px;z-index: 1000;background-color: grey;">
+            <svg class="icon" 
+            style="width: 50px; height: 50px;vertical-align: middle;fill: white;overflow: hidden;" 
+            viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6091">
+            <path d="M680 728a16 16 0 0 1 16 16v16a16 16 0 0 1-16 16h-320a16 16 0 0 1-16-16v-16a16 16 0 0 1 16-16h320zM832 240a16 16 0 0 1 16 16v400a16 16 0 0 1-16 16H208a16 16 0 0 1-16-16V256a16 16 0 0 1 16-16h624z m-32 48H240v336h560V288z m-333.824 72.96a16 16 0 0 1 7.76 2.016l140.064 77.568a16 16 0 0 1 0 28l-140.064 77.568a16 16 0 0 1-23.76-13.984V376.96a16 16 0 0 1 16-16z m32 70.32v46.544l42.032-23.28-42.032-23.264z" p-id="6092"></path></svg>
+        
+        
+        </div>
+        <div id = 'control' style="position: absolute;bottom: 0px;background-color: grey;width: 100%;padding-left: 100px;padding-top: 10px;padding-bottom: 10px;;">
+            <tr style="width: 100%;margin-left: 50px;padding-left: 50px;;"  align=center>
+                
+                <td>
+                    <div id="bink" onclick="changebink();" class="divbuttons">☼</div>
+                    <div id="speed" onclick="changespeed();" class="divbuttons"></div>
+                    <div id="td" onclick="changetd();" class="divbuttons"></div>
+                    <div id="d" onclick="changedirection();" class="divbuttons"></div>
+                    <div id="bg" onclick="changebg();" class="divbuttons">BG</div>
+                    <div id='Tc' onclick="changetcolor()" class="divbuttons">Tx</div>
+                    <div id='Ts' onclick="changetsize()" class="divbuttons"></div>
+                    <div id='like' onclick="like()" class="divbuttons" style="color: red;">♥</div>
+                    <div id='text' onkeydown="changeview()" contenteditable="true" onclick="changetsize()" class="divbuttons" style="width:auto;min-width:200px;">ABC123</div>
+
+                </td>
+            </tr>
+        </div>
+        
+            
+    </body>
+</html>
