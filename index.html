@@ -6,11 +6,13 @@
         <script type="text/javascript">
             var isfull = false;
             var colorlist = ['black','white','red','orange','yellow','green','blue'];
-            var dlist = ['↑','↓','←','→','●'];
-            var tdlist = ['##','#<br>#'];
-            var binkspeed = ['——','|','||','|||','||||'];
+            var dlist = ['↑','↓','←','→'];
+            var tdlist = ['0°','90°','180°','270°'];
+            var binkspeed = ['—','|','||','|||','||||'];
             var speedlist = ['■','▶','▶▶','▶▶▶'];
-            var sizelist = ['0.3','0.5','0.75','0.95'];
+            var sizelist = ['0.3','0.5','0.7','0.9'];
+            var fontlist = ['SimSun','SimHei','YaHei'];
+            var newlinelist = ['=','-'];
 
             function like(){
                 window.open("https://github.com/AntoniotheFuture/words-on-screen.github.io");
@@ -25,24 +27,47 @@
                 setcolor('bg',colorlist[0]);
                 setcolor('Tc',colorlist[1]);
                 setit('Ts',sizelist[0]);
+                setit('Font',fontlist[0]);
+                setit('newline',newlinelist[0]);
                 changeview();
-                run();
+                //run();
             }
 
             function changeview(){
                 var ele = document.getElementById('show');
+                ele.innerHTML = document.getElementById('text').innerHTML;
+               
                 document.body.style.backgroundColor = getcolor('bg');
                 ele.style.color = getcolor('Tc');
-                
-                if(getit('td') == '##'){
-                    ele.style.writingMode = 'lr-tb';
-                    var Theight = window.screen.height;
-                }else{
-                    ele.style.writingMode = 'tb-rl';
-                    var Theight = window.screen.width;
+
+
+                var deg = getit('td').replace('°','');
+                ele.style.transform = 'rotate(' + deg + 'deg)';
+                ele.style.webkitTransform = 'rotate(' + deg + 'deg)';
+
+                var Theight = window.screen.height;
+                if(deg == '90'||deg == '270'){
+                    Theight = window.screen.width;
                 }
+                
                 ele.style.fontSize = getit('Ts') *  Theight + 'px';
-                ele.innerHTML = document.getElementById('text').innerHTML;
+                ele.style.fontFamily = getit('Font');
+
+                if(getit('newline') == '=' && getit('Ts') <= 0.5){
+                        ele.style.wordBreak = 'break-all'; 
+                        ele.style.lineHeight = ele.style.fontSize ;
+                        ele.style.width = '100%';
+                        if(deg == '90'||deg == '270'){
+                            ele.style.width = 'auto';
+                        }
+                }else{
+                    ele.style.wordBreak = 'keep-all'; 
+                    ele.style.lineHeight = ele.clientWidth + 'px' ;
+                }
+
+                fixpos(0,0);
+                
+                
 
             }
             var pid;
@@ -60,10 +85,12 @@
                 var fx = 0;
                 var fy = 0;
                 var b = 0;
+                var wh = document.body.clientHeight;
+                var ww = document.body.clientWidth;
                 
                 var stop = false;
 
-                if(bink == '——'){binkspeed = 0;}
+                if(bink == '—'){binkspeed = 0;}
                 if(bink == '||||'){binkspeed = 20;}
                 if(bink == '|||'){binkspeed = 50;}
                 if(bink == '||'){binkspeed = 100;}
@@ -75,22 +102,29 @@
                 if(d == '↓'){dx = 1;dy = 0;}
                 if(d == '←'){dx = 0;dy = -1;}
                 if(d == '→'){dx = 0;dy = 1;}
-                if(d == '●'){dx = 0;dy = 0;}
 
                 if(s == '■'){speed = 0;}
-                if(s == '▶'){speed = 3;}
-                if(s == '▶▶'){speed = 6;}
-                if(s == '▶▶▶'){speed = 9;}
+                if(s == '▶'){speed = 1;}
+                if(s == '▶▶'){speed = 2;}
+                if(s == '▶▶▶'){speed = 4;}
 
                 if(speed == 0 && binkspeed == 0){
-                    ele.style.top = '0px'; 
-                    ele.style.left = '0px'; 
-                    ele.style.display = 'block';}
+                    fixpos(0,0);
+                    ele.style.display = 'block';
+                }
+                
 
                 clearInterval(pid);
-                pid = setInterval(frame, 5);
                 ele.style.display = 'block';
+                var deg = getit('td').replace('°','');
+                if(deg == '90'||deg == '270'){
+                    var contentw = ele.clientHeight;
+                    var contenth = ele.clientWidth;
+                }
+                pid = setInterval(frame, 5);
+                //alert(wh);
                 function frame() {
+                    
                     
                     if(binkspeed ==0){
                         ele.style.display = 'block';
@@ -101,25 +135,34 @@
                             ele.style.display = ele.style.display == 'none'? 'block' : 'none';
                         }
                     }
+                    
                     if(speed == 0){
-                        ele.style.top = '0px'; 
-                        ele.style.left = '0px'; 
+                        fixpos(0,0);
                     }else{
                         fx = fx + (dx * speed);
                         fy = fy + (dy * speed);
                         
-                        if(fx > contenth){fx = -1 * contenth;}
-                        if(fx < -1 * contenth){fx = contenth;}
-                        if(fy > contentw){fy = -1 * contentw;}
-                        if(fy < -1 * contentw){fy = contentw;}
+                        if(fx > 0.5 * (wh + contenth)){fx = -0.5 * (wh + contenth);}
+                        if(fx < -0.5 * (wh + contenth)){fx = 0.5 * (wh + contenth);}
+                        if(fy > 0.5 * (ww + contentw)){fy = -0.5 * (ww + contentw);}
+                        if(fy < -0.5 * (ww + contentw)){fy = 0.5 * (ww + contentw);}
                         //if(fy >= contentw||fy <= -1 * contentw){ fy = contentw * dy;}
-
-                        ele.style.top = fx + 'px'; 
-                        ele.style.left = fy + 'px'; 
+                        fixpos(fx,fy);
                     }
 
                 }
                 
+            }
+
+            function fixpos(x,y){
+                var ele = document.getElementById('show');
+                var wh = document.body.clientHeight;
+                var ww = document.body.clientWidth;
+                var contentw = ele.clientWidth;
+                var contenth = ele.clientHeight;
+                ele.style.top = (0.5 * wh + x - 0.5 * contenth) + 'px';
+                ele.style.left = (0.5 * ww + y - 0.5 * contentw) + 'px';
+
             }
 
             //寻找下标
@@ -194,6 +237,15 @@
                 run();
             }
 
+            function changefont(){
+                var s = getit('Font');
+                var i = apos(fontlist,s);
+                i++;
+                if(i>fontlist.length - 1){i = 0};
+                setit('Font',fontlist[i]);
+                changeview();
+            }
+
             function changebink(){
                 var s = getit('bink');
                 var i = apos(binkspeed,s);
@@ -209,6 +261,7 @@
                 i++;
                 if(i>speedlist.length -1){i = 0};
                 setit('speed',speedlist[i]);
+                changeview();
                 run();
             }
 
@@ -218,6 +271,17 @@
                 i++;
                 if(i>tdlist.length - 1){i = 0};
                 setit('td',tdlist[i]);
+                changeview();
+                run();
+            }
+
+            function changenewline(){
+                var s = getit('newline');
+                var i = apos(newlinelist,s);
+                i++;
+                if(i>newlinelist.length - 1){i = 0};
+                setit('newline',newlinelist[i]);
+                changeview();
                 run();
             }
 
@@ -257,48 +321,49 @@
             })();
         </script>
         <style>
-            .divbuttons {
-                margin-left: 10px;
+            .divbuttons div{
+                margin:5px;
                 width:50px;
                 height:50px;
-                background-color:lightgray;
                 border-radius:15px;
-                float: left;
-                font-size: 35px; 
+                
+                font-size: 25px; 
                 text-align: center;
                 background-color: white;
+                cursor: pointer;
+                display: inline-block;
+                line-height:50px;
             }
 
         </style>
     </head>
-    <body onload="ready();" style="padding:0px;width:100;height:100%;overflow: hidden;">
-        <div id = 'show' style="position: absolute;font-size: 1000px;text-align: center;">
+    <body onload="ready();" style="padding:0px;width:100%;height:100%;overflow: hidden;">
+        <div id = 'show' style="position: absolute;text-align: center;overflow: hidden;word-break: keep-all;width: auto;height:auto;">
             1231221321213
         </div>
-        <div onclick="fullscreen();" id="fullbutton" style="position:absolute;bottom:0px;left: 0px;z-index: 1000;background-color: grey;">
+        <div onclick="fullscreen();" id="fullbutton" style="position:absolute;top:0px;left: auto;right: auto;   z-index: 1000;background-color:rgba(100, 100, 100, 0.5);">
             <svg class="icon" 
-            style="width: 50px; height: 50px;vertical-align: middle;fill: white;overflow: hidden;" 
+            style="width: 50px; height: 50px;vertical-align: middle;fill: lightgray;overflow: hidden;" 
             viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6091">
             <path d="M680 728a16 16 0 0 1 16 16v16a16 16 0 0 1-16 16h-320a16 16 0 0 1-16-16v-16a16 16 0 0 1 16-16h320zM832 240a16 16 0 0 1 16 16v400a16 16 0 0 1-16 16H208a16 16 0 0 1-16-16V256a16 16 0 0 1 16-16h624z m-32 48H240v336h560V288z m-333.824 72.96a16 16 0 0 1 7.76 2.016l140.064 77.568a16 16 0 0 1 0 28l-140.064 77.568a16 16 0 0 1-23.76-13.984V376.96a16 16 0 0 1 16-16z m32 70.32v46.544l42.032-23.28-42.032-23.264z" p-id="6092"></path></svg>
         
         
         </div>
-        <div id = 'control' style="position: absolute;bottom: 0px;background-color: grey;width: 100%;padding-left: 100px;padding-top: 10px;padding-bottom: 10px;;">
-            <tr style="width: 100%;margin-left: 50px;padding-left: 50px;;"  align=center>
+        <div id = 'control' style="position: absolute;bottom: -10px;left: -2px;  background-color: grey;width: 100%;">
+            <div style="overflow-x: scroll;  white-space: nowrap;" class="divbuttons">
+                <div id='text' onclick="this.innerHTML = prompt('',this.innerHTML);changeview()" style="min-width:200px;max-width: 500px;width: auto;">ABC123</div>
+                <div id="bink" onclick="changebink();">☼</div>
+                <div id="speed" onclick="changespeed();" style="font-size: 20px;"></div>
+                <div id="td" onclick="changetd();"></div>
+                <div id="d" onclick="changedirection();" ></div>
+                <div id="bg" onclick="changebg();" >BG</div>
+                <div id='Tc' onclick="changetcolor()">Tx</div>
+                <div id='Ts' onclick="changetsize()" ></div>
+                <div id='Font' onclick="changefont()" style="width: auto;"></div>
+                <div id='newline' onclick="changenewline()">=</div>
+                <div id='like' onclick="like()" style="color: red;">♥</div>
                 
-                <td>
-                    <div id="bink" onclick="changebink();" class="divbuttons">☼</div>
-                    <div id="speed" onclick="changespeed();" class="divbuttons" style="font-size:15px;line-height:50px;"></div>
-                    <div id="td" onclick="changetd();" class="divbuttons" style="font-size:20px;line-height:50px;"></div>
-                    <div id="d" onclick="changedirection();" class="divbuttons"></div>
-                    <div id="bg" onclick="changebg();" class="divbuttons">BG</div>
-                    <div id='Tc' onclick="changetcolor()" class="divbuttons">Tx</div>
-                    <div id='Ts' onclick="changetsize()" class="divbuttons" style="font-size:20px;line-height:50px;"></div>
-                    <div id='like' onclick="like()" class="divbuttons" style="color: red;">♥</div>
-                    <div id='text' onkeyup="changeview()"  contenteditable="true" class="divbuttons" style="width:auto;min-width:200px;">ABC123</div>
-
-                </td>
-            </tr>
+            </div>
         </div>
         
             
