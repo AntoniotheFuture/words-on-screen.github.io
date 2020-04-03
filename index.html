@@ -1,8 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>在线全屏弹幕Display simple text animation in one single web page,for person-picking-up、concert，etc, works good using tablet
-</title>
+        <title>全屏弹幕网页版Words-on-screen</title>
         <script type="text/javascript">
             var isfull = false;
             var colorlist = ['black','white','red','orange','yellow','green','blue'];
@@ -11,6 +10,10 @@
             var binkspeed = ['——','|','||','|||','||||'];
             var speedlist = ['■','▶','▶▶','▶▶▶'];
             var sizelist = ['0.3','0.5','0.75','0.95'];
+
+            function like(){
+                window.open("https://github.com/AntoniotheFuture/words-on-screen.github.io");
+            }
             
             function ready(){
                 setit('bink',binkspeed[0]);
@@ -219,8 +222,6 @@
 
             function handleFullScreen(){
                 let element = document.documentElement;
-                // 判断是否已经是全屏
-                // 如果是全屏，退出
                 if (isfull) {
                     if (document.exitFullscreen) {
                         document.exitFullscreen();
@@ -231,8 +232,7 @@
                     } else if (document.msExitFullscreen) {
                         document.msExitFullscreen();
                     }
-                    console.log('已还原！');
-                } else {    // 否则，进入全屏
+                } else {
                     if (element.requestFullscreen) {
                         element.requestFullscreen();
                     } else if (element.webkitRequestFullScreen) {
@@ -243,7 +243,6 @@
                         // IE11
                         element.msRequestFullscreen();
                     }
-                    console.log('已全屏！');
                 }
             }
         </script>
@@ -288,14 +287,14 @@
                 
                 <td>
                     <div id="bink" onclick="changebink();" class="divbuttons">☼</div>
-                    <div id="speed" onclick="changespeed();" class="divbuttons"></div>
-                    <div id="td" onclick="changetd();" class="divbuttons"></div>
+                    <div id="speed" onclick="changespeed();" class="divbuttons" style="font-size:15px;line-height:50px;"></div>
+                    <div id="td" onclick="changetd();" class="divbuttons" style="font-size:20px;line-height:50px;"></div>
                     <div id="d" onclick="changedirection();" class="divbuttons"></div>
                     <div id="bg" onclick="changebg();" class="divbuttons">BG</div>
                     <div id='Tc' onclick="changetcolor()" class="divbuttons">Tx</div>
-                    <div id='Ts' onclick="changetsize()" class="divbuttons"></div>
+                    <div id='Ts' onclick="changetsize()" class="divbuttons" style="font-size:20px;line-height:50px;"></div>
                     <div id='like' onclick="like()" class="divbuttons" style="color: red;">♥</div>
-                    <div id='text' onkeydown="changeview()" contenteditable="true" onclick="changetsize()" class="divbuttons" style="width:auto;min-width:200px;">ABC123</div>
+                    <div id='text' onkeyup="changeview()"  contenteditable="true" class="divbuttons" style="width:auto;min-width:200px;">ABC123</div>
 
                 </td>
             </tr>
