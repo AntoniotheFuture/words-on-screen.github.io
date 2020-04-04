@@ -10,7 +10,7 @@
             var tdlist = ['0°','90°','180°','270°'];
             var binkspeed = ['—','|','||','|||','||||'];
             var speedlist = ['■','▶','▶▶','▶▶▶'];
-            var sizelist = ['0.3','0.5','0.7','0.9'];
+            var sizelist = ['0.3','0.4','0.5','0.7','0.9'];
             var fontlist = ['SimSun','SimHei','YaHei'];
             var newlinelist = ['=','-'];
 
@@ -54,15 +54,18 @@
                 ele.style.fontFamily = getit('Font');
 
                 if(getit('newline') == '=' && getit('Ts') <= 0.5){
-                        ele.style.wordBreak = 'break-all'; 
-                        ele.style.lineHeight = ele.style.fontSize ;
-                        ele.style.width = '100%';
-                        if(deg == '90'||deg == '270'){
-                            ele.style.width = 'auto';
-                        }
+                    ele.style.wordBreak = 'break-all'; 
+                    ele.style.whiteSpace = 'normal';
+                    ele.style.lineHeight = ele.style.fontSize ;
+                    ele.style.width = '100%';
+                    if(deg == '90'||deg == '270'){
+                        ele.style.width = window.screen.height + 'px';
+                    }
                 }else{
                     ele.style.wordBreak = 'keep-all'; 
-                    ele.style.lineHeight = ele.clientWidth + 'px' ;
+                    ele.style.lineHeight = ele.style.fontSize;
+                    ele.style.whiteSpace = 'nowrap';
+                    ele.style.width = 'auto';
                 }
 
                 fixpos(0,0);
@@ -110,12 +113,12 @@
 
                 if(speed == 0 && binkspeed == 0){
                     fixpos(0,0);
-                    ele.style.display = 'block';
+                    ele.style.visibility = 'visible';
                 }
                 
 
                 clearInterval(pid);
-                ele.style.display = 'block';
+                ele.style.visibility = 'visible';
                 var deg = getit('td').replace('°','');
                 if(deg == '90'||deg == '270'){
                     var contentw = ele.clientHeight;
@@ -127,12 +130,12 @@
                     
                     
                     if(binkspeed ==0){
-                        ele.style.display = 'block';
+                        ele.style.visibility = 'visible';
                     }else{
                         b--;
                         if(b < 0){
                             b = binkspeed;
-                            ele.style.display = ele.style.display == 'none'? 'block' : 'none';
+                            ele.style.visibility = ele.style.visibility == 'visible'? 'hidden' : 'visible';
                         }
                     }
                     
@@ -252,6 +255,7 @@
                 i++;
                 if(i>binkspeed.length - 1){i = 0};
                 setit('bink',binkspeed[i]);
+                changeview();
                 run();
             }
 
@@ -341,7 +345,7 @@
 
         </style>
     </head>
-    <body onload="ready();" style="padding:0px;width:100%;height:100%;overflow: hidden;">
+    <body onload="ready();" onresize="changeview();run();" style="padding:0px;width:100%;height:100%;overflow: hidden;margin: 0px;">
         <div id = 'show' style="position: absolute;text-align: center;overflow: hidden;word-break: keep-all;width: auto;height:auto;">
             1231221321213
         </div>
@@ -353,7 +357,7 @@
         
         
         </div>
-        <div id = 'control' style="position: absolute;bottom: -10px;left: -2px;  background-color: grey;width: 100%;">
+        <footer id = 'control' style="position: absolute;bottom: 0px;left: -2px;  background-color: grey;width: 100%;">
             <div style="overflow-x: scroll;  white-space: nowrap;" class="divbuttons">
                 <div id='text' onclick="this.innerHTML = prompt('',this.innerHTML);changeview()" style="min-width:200px;max-width: 500px;width: auto;">ABC123</div>
                 <div id="bink" onclick="changebink();">☼</div>
@@ -368,7 +372,7 @@
                 <div id='like' onclick="like()" style="color: red;">♥</div>
                 
             </div>
-        </div>
+        </footer>
         
             
     </body>
